@@ -16,12 +16,23 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-        // DI
+        // DI.
         builder.Services.AddDbContext<AppDbContext>(options =>
         {
             string? connection = builder.Configuration.GetConnectionString("Local-SqlServer") ?? throw new InvalidOperationException("ConnectionString Does Not Exsit.");
 
             options.UseSqlServer(connection);
+        });
+
+        // Cors.
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", builder =>
+            {
+                builder.AllowAnyHeader()
+                       .AllowAnyMethod()
+                       .AllowAnyOrigin();
+            });
         });
 
         var app = builder.Build();
@@ -33,10 +44,11 @@ public class Program
             app.UseSwaggerUI();
         }
 
-        app.UseHttpsRedirection();
+        // app.UseHttpsRedirection();
 
-        app.UseAuthorization();
+        // app.UseAuthorization();
 
+        app.UseCors("AllowAll");
 
         app.MapControllers();
 
